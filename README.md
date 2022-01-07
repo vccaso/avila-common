@@ -1,1 +1,2 @@
-# avila-common
+# module avila-common
+avila-common

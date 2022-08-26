@@ -23,9 +23,9 @@ type User struct {
 	Lastname      string    `json:"lastName" validate:"required"`
 	Alias         string    `json:"alias" validate:"required"`
 	Password      string    `json:"password" validate:"required"`
-	Creation_date time.Time `json:"-"`
-	Isactive      bool      `json:"-"`
-	Isdeleted     bool      `json:"-"`
+	Creation_date time.Time `json:"creation_date"`
+	Isactive      bool      `json:"isactive"`
+	Isdeleted     bool      `json:"isdeleted"`
 }
 
 // swagger:model

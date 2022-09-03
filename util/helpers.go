@@ -21,3 +21,10 @@ func JsonResponseWithCode(response http.ResponseWriter, data interface{}, httpCo
 	ljson, _ := json.Marshal(data)
 	fmt.Fprintf(response, "%v", string(ljson))
 }
+
+func ObjectFromBody(request *http.Request, data interface{}) error {
+
+	decoder := json.NewDecoder(request.Body)
+	err := decoder.Decode(&data)
+	return err
+}

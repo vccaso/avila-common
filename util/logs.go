@@ -8,7 +8,7 @@ import (
 	"os"
 	"time"
 
-	"avila-common/model"
+	"github.com/vccaso/avila-common/model"
 )
 
 var logs_host string = "http://" + os.Getenv("LOGS_HOST") + ":8093/api"

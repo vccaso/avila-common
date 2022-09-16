@@ -4,7 +4,7 @@ import (
 	"os"
 	"time"
 
-	"avila-common/model"
+	"github.com/vccaso/avila-common/model"
 
 	"github.com/dgrijalva/jwt-go"
 )

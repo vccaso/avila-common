@@ -1,8 +1,14 @@
 package util
 
 import (
+	"bytes"
+	"encoding/json"
 	"log"
+	"net/http"
 	"os"
+	"time"
+
+	"github.com/vccaso/avila-common/model"
 )
 
 // Info writes logs in the color blue with "INFO: " as prefix
@@ -23,26 +29,40 @@ func CheckPanic(e error) {
 	}
 }
 
+var app string = os.Getenv("APPLICATION_NAME")
+
 func CheckError(e error) {
 	if e != nil {
 		Error.Println(e.Error())
+		SendToLog(app, "ERROR", e.Error())
 	}
 }
 
-func CheckWarning(e error) {
-	if e != nil {
-		Warning.Println(e.Error())
-	}
+func CheckWarning(m string) {
+	Warning.Println(m)
+	SendToLog(app, "WARNING", m)
 }
 
-func CheckInfo(e error) {
-	if e != nil {
-		Info.Println(e.Error())
-	}
+func CheckInfo(m string) {
+	Info.Println(m)
+	SendToLog(app, "INFO", m)
 }
 
-func CheckDebug(e error) {
-	if e != nil {
-		Debug.Println(e.Error())
-	}
+func CheckDebug(m string) {
+	Debug.Println(m)
+	SendToLog(app, "DEBUG", m)
+}
+
+func SendToLog(app string, level string, m string) {
+	error := model.Error{}
+	error.App = app
+	error.Error_time = time.Now()
+	error.Message = level + ":" + m
+	error.Gateway_session = "TODO"
+
+	reqBodyBytes := new(bytes.Buffer)
+	json.NewEncoder(reqBodyBytes).Encode(error)
+	resp, err := http.Post(logs_host+"/error", "application/json", bytes.NewBuffer(reqBodyBytes.Bytes()))
+	Error.Println(err.Error())
+	defer resp.Body.Close()
 }

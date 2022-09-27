@@ -3,10 +3,10 @@ package main
 import (
 	"fmt"
 
-	"github.com/pkg/errors"
+	"github.com/vccaso/avila-common/util"
 )
 
 func main() {
 	fmt.Println("module avila-common")
-	fmt.Println(errors.New("testing error"))
+	util.CheckInfo("Starting avila-common")
 }

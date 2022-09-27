@@ -23,6 +23,10 @@ type Error struct {
 	//
 	// required: true
 	App string `json:"app" validate:"required"`
+	// level
+	//
+	// required: true
+	Level string `json:"level" validate:"required"`
 	// Error message
 	//
 	// required: true

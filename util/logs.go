@@ -25,6 +25,7 @@ func HandleApiError(e error, appName string, httpCode int, errorMessage string, 
 		error := model.Error{}
 		error.App = appName
 		error.Error_time = time.Now()
+		error.Level = "Error"
 		error.Message = e.Error()
 		error.Gateway_session = "TODO"
 

@@ -38,6 +38,12 @@ func CheckError(e error) {
 	}
 }
 
+func LogError(e error) {
+	if e != nil {
+		Error.Println(e.Error())
+	}
+}
+
 func CheckWarning(m string) {
 	Warning.Println(m)
 	SendToLog(app, "WARNING", m)
@@ -59,6 +65,7 @@ func SendToLog(app string, level string, m string) {
 	error.Error_time = time.Now()
 	error.Message = level + ":" + m
 	error.Gateway_session = "TODO"
+	error.Level = level
 
 	reqBodyBytes := new(bytes.Buffer)
 	json.NewEncoder(reqBodyBytes).Encode(error)

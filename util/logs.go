@@ -11,7 +11,7 @@ import (
 	"github.com/vccaso/avila-common/model"
 )
 
-var logs_host string = "http://" + os.Getenv("LOGS_HOST") + ":8093/api"
+var logs_host string = "http://" + os.Getenv("LOGS_HOST") + "/api"
 
 type ApiError struct {
 	StatusCode int

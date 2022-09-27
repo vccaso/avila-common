@@ -70,8 +70,11 @@ func SendToLog(app string, level string, m string) {
 	reqBodyBytes := new(bytes.Buffer)
 	json.NewEncoder(reqBodyBytes).Encode(error)
 	resp, err := http.Post(logs_host+"/error", "application/json", bytes.NewBuffer(reqBodyBytes.Bytes()))
+	if resp != nil {
+		defer resp.Body.Close()
+	}
 	if err != nil {
 		Error.Println(err.Error())
 	}
-	defer resp.Body.Close()
+
 }

@@ -63,13 +63,15 @@ func SendToLog(app string, level string, m string) {
 	error := model.Error{}
 	error.App = app
 	error.Error_time = time.Now()
-	error.Message = level + ":" + m
+	error.Message = m
 	error.Gateway_session = "TODO"
 	error.Level = level
 
 	reqBodyBytes := new(bytes.Buffer)
 	json.NewEncoder(reqBodyBytes).Encode(error)
 	resp, err := http.Post(logs_host+"/error", "application/json", bytes.NewBuffer(reqBodyBytes.Bytes()))
-	Error.Println(err.Error())
+	if err != nil {
+		Error.Println(err.Error())
+	}
 	defer resp.Body.Close()
 }

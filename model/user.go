@@ -17,18 +17,18 @@ type User struct {
 	//
 	// required: false
 	// min: 1
-	Id             int64     `json:"id"`
-	Email          string    `json:"email" validate:"required,email"`
-	Firstname      string    `json:"firstName" validate:"required"`
-	Lastname       string    `json:"lastName" validate:"required"`
-	Alias          string    `json:"alias" validate:"required"`
-	Avatar         string    `json:"avatar" validate:"required"`
-	Status         string    `json:"status" validate:"required"`
-	Reset_password bool      `json:"reset_password"`
-	Password       string    `json:"password" validate:"required"`
-	Creation_date  time.Time `json:"creation_date"`
-	Isactive       bool      `json:"isactive"`
-	Isdeleted      bool      `json:"isdeleted"`
+	Id            int64     `json:"id"`
+	Email         string    `json:"email" validate:"required,email"`
+	Firstname     string    `json:"firstName" validate:"required"`
+	Lastname      string    `json:"lastName" validate:"required"`
+	Alias         string    `json:"alias" validate:"required"`
+	Avatar        string    `json:"avatar" validate:"required"`
+	Status        string    `json:"status" validate:"required"`
+	ResetPassword bool      `json:"resetPassword"`
+	Password      string    `json:"password" validate:"required"`
+	CreationDate  time.Time `json:"creationDate"`
+	Isactive      bool      `json:"isactive"`
+	Isdeleted     bool      `json:"isdeleted"`
 }
 
 // swagger:model

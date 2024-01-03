@@ -24,8 +24,9 @@ type User struct {
 	Alias         string    `json:"alias" validate:"required"`
 	Avatar        string    `json:"avatar" validate:"required"`
 	Status        string    `json:"status" validate:"required"`
+	ResetPassword bool      `json:"resetPassword"`
 	Password      string    `json:"password" validate:"required"`
-	Creation_date time.Time `json:"creation_date"`
+	CreationDate  time.Time `json:"creationDate"`
 	Isactive      bool      `json:"isactive"`
 	Isdeleted     bool      `json:"isdeleted"`
 }

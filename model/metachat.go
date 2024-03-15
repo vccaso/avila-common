@@ -29,6 +29,7 @@ type MetachatRow struct {
 	AppearanceLayoutHeaderColor        string
 	AppearanceLayoutHeaderText         string
 	AppearanceLayoutBackGround         string
+	AppearanceLayoutFooter             string
 	AppearanceLayoutOperatorBubble     string
 	AppearanceLayoutOperatorBubbleText string
 	AppearanceLayoutVisitorBubble      string
@@ -107,6 +108,7 @@ type Appearance struct {
 	LayoutHeaderColor        string `json:"layout_header_color"`
 	LayoutHeaderText         string `json:"layout_header_text"`
 	LayoutBackGround         string `json:"layout_background"`
+	LayoutFooter             string `json:"layout_footer"`
 	LayoutOperatorBubble     string `json:"layout_operator_bubble"`
 	LayoutOperatorBubbleText string `json:"layout_operator_bubble_text"`
 	LayoutVisitorBubble      string `json:"layout_visitor_bubble"`
@@ -175,6 +177,7 @@ func (metachat *Metachat) loadFromMetachow(s MetachatRow) {
 	metachat.Appearance.LayoutHeaderColor = s.AppearanceLayoutHeaderColor
 	metachat.Appearance.LayoutHeaderText = s.AppearanceLayoutHeaderText
 	metachat.Appearance.LayoutBackGround = s.AppearanceLayoutBackGround
+	metachat.Appearance.LayoutFooter = s.AppearanceLayoutFooter
 	metachat.Appearance.LayoutOperatorBubble = s.AppearanceLayoutOperatorBubble
 	metachat.Appearance.LayoutOperatorBubbleText = s.AppearanceLayoutOperatorBubbleText
 	metachat.Appearance.LayoutVisitorBubble = s.AppearanceLayoutVisitorBubble

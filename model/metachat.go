@@ -229,7 +229,7 @@ func (metachat *Metachat) MapMetachat(row *sql.Row) error {
 
 	var s MetachatRow
 	err := row.Scan(&s.MetachatId, &s.MetachatCustomerId, &s.MetachatSiteId, &s.MetachatThemeId, &s.MetachatCreationDate, &s.MetachatIsEnabled, &s.MetachatIsDeleted,
-		&s.AppearanceId, &s.AppearanceTitle, &s.AppearanceLayout, &s.AppearanceLayoutHeaderColor, &s.AppearanceLayoutHeaderText, &s.AppearanceLayoutBackGround, &s.AppearanceLayoutOperatorBubble,
+		&s.AppearanceId, &s.AppearanceTitle, &s.AppearanceLayout, &s.AppearanceLayoutHeaderColor, &s.AppearanceLayoutHeaderText, &s.AppearanceLayoutBackGround, &s.AppearanceLayoutFooter, &s.AppearanceLayoutOperatorBubble,
 		&s.AppearanceLayoutOperatorBubbleText, &s.AppearanceLayoutVisitorBubble, &s.AppearanceLayoutVisitorBubbleText, &s.AppearanceBtnPosition, &s.AppearanceShowAvatar, &s.AppearanceAvatarId,
 		&s.AppearanceIconButton, &s.AppearanceShowPositionNum, &s.AppearancePlaySoundStart, &s.AppearancePlaySoundDecre, &s.AppearanceOfferTalkBot,
 		&s.DeploymentId, &s.DeploymentDeployHtmlCode, &s.DeploymentMailToSendHtmlCode, &s.DeploymentDomainAllowedDeployment,
@@ -255,7 +255,7 @@ func (metachats *Metachats) MapMetachats(rows *sql.Rows) error {
 		var s MetachatRow
 
 		err := rows.Scan(&s.MetachatId, &s.MetachatCustomerId, &s.MetachatSiteId, &s.MetachatThemeId, &s.MetachatCreationDate, &s.MetachatIsEnabled, &s.MetachatIsDeleted,
-			&s.AppearanceId, &s.AppearanceTitle, &s.AppearanceLayout, &s.AppearanceLayoutHeaderColor, &s.AppearanceLayoutHeaderText, &s.AppearanceLayoutBackGround, &s.AppearanceLayoutOperatorBubble,
+			&s.AppearanceId, &s.AppearanceTitle, &s.AppearanceLayout, &s.AppearanceLayoutHeaderColor, &s.AppearanceLayoutHeaderText, &s.AppearanceLayoutBackGround, &s.AppearanceLayoutFooter, &s.AppearanceLayoutOperatorBubble,
 			&s.AppearanceLayoutOperatorBubbleText, &s.AppearanceLayoutVisitorBubble, &s.AppearanceLayoutVisitorBubbleText, &s.AppearanceBtnPosition, &s.AppearanceShowAvatar, &s.AppearanceAvatarId,
 			&s.AppearanceIconButton, &s.AppearanceShowPositionNum, &s.AppearancePlaySoundStart, &s.AppearancePlaySoundDecre, &s.AppearanceOfferTalkBot,
 			&s.DeploymentId, &s.DeploymentDeployHtmlCode, &s.DeploymentMailToSendHtmlCode, &s.DeploymentDomainAllowedDeployment,

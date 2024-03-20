@@ -160,7 +160,7 @@ type Postchat struct {
 
 type Metachats []*Metachat
 
-func (metachat *Metachat) loadFromMetachow(s MetachatRow) {
+func (metachat *Metachat) loadFromMetachat(s MetachatRow) {
 
 	metachat.Id = s.MetachatId
 	metachat.CustomerId = s.MetachatCustomerId
@@ -242,7 +242,7 @@ func (metachat *Metachat) MapMetachat(row *sql.Row) error {
 		return err
 	}
 
-	metachat.loadFromMetachow(s)
+	metachat.loadFromMetachat(s)
 	println("Metachat: ", metachat)
 
 	return nil
@@ -270,7 +270,7 @@ func (metachats *Metachats) MapMetachats(rows *sql.Rows) error {
 			return err
 		}
 
-		metachat.loadFromMetachow(s)
+		metachat.loadFromMetachat(s)
 		println("Metachat: ", metachat)
 
 		*metachats = append(*metachats, &metachat)

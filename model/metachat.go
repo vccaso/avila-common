@@ -2,8 +2,9 @@ package model
 
 import (
 	"database/sql"
-	"fmt"
 	"time"
+
+	"fmt"
 )
 
 type MetaChatRequest struct {
@@ -244,7 +245,7 @@ func (metachat *Metachat) MapMetachat(row *sql.Row) error {
 	}
 
 	metachat.loadFromMetachat(s)
-	fmt.Println("Metachat: ", metachat)
+	fmt.Println("Metachat:", metachat)
 
 	return nil
 }
@@ -272,7 +273,7 @@ func (metachats *Metachats) MapMetachats(rows *sql.Rows) error {
 		}
 
 		metachat.loadFromMetachat(s)
-		fmt.Println("Metachat: ", metachat)
+		fmt.Println("Metachat:", metachat)
 
 		*metachats = append(*metachats, &metachat)
 	}

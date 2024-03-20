@@ -2,6 +2,7 @@ package model
 
 import (
 	"database/sql"
+	"fmt"
 	"time"
 )
 
@@ -243,7 +244,7 @@ func (metachat *Metachat) MapMetachat(row *sql.Row) error {
 	}
 
 	metachat.loadFromMetachat(s)
-	println("Metachat: ", metachat)
+	fmt.Println("Metachat: ", metachat)
 
 	return nil
 }
@@ -271,7 +272,7 @@ func (metachats *Metachats) MapMetachats(rows *sql.Rows) error {
 		}
 
 		metachat.loadFromMetachat(s)
-		println("Metachat: ", metachat)
+		fmt.Println("Metachat: ", metachat)
 
 		*metachats = append(*metachats, &metachat)
 	}

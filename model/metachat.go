@@ -265,7 +265,7 @@ func (metachats *Metachats) MapMetachats(rows *sql.Rows) error {
 			&s.PostchatId, &s.PostchatEnabled, &s.PostchatSendSurvey, &s.PostchatAsk, &s.PostchatShowSolved, &s.PostchatSendEndMsg)
 
 		if err != nil {
-			return nil
+			return err
 		}
 
 		metachat.loadFromMetachow(s)

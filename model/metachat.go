@@ -271,6 +271,7 @@ func (metachats *Metachats) MapMetachats(rows *sql.Rows) error {
 		}
 
 		metachat.loadFromMetachow(s)
+		println("Metachat: ", metachat)
 
 		*metachats = append(*metachats, &metachat)
 	}

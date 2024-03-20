@@ -243,6 +243,8 @@ func (metachat *Metachat) MapMetachat(row *sql.Row) error {
 	}
 
 	metachat.loadFromMetachow(s)
+	println("Metachat: ", metachat)
+
 	return nil
 }
 

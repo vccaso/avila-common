@@ -3,6 +3,8 @@ package model
 import (
 	"database/sql"
 	"time"
+
+	"fmt"
 )
 
 type MetaChatRequest struct {
@@ -160,7 +162,7 @@ type Postchat struct {
 
 type Metachats []*Metachat
 
-func (metachat *Metachat) loadFromMetachow(s MetachatRow) {
+func (metachat *Metachat) loadFromMetachat(s MetachatRow) {
 
 	metachat.Id = s.MetachatId
 	metachat.CustomerId = s.MetachatCustomerId
@@ -242,7 +244,9 @@ func (metachat *Metachat) MapMetachat(row *sql.Row) error {
 		return err
 	}
 
-	metachat.loadFromMetachow(s)
+	metachat.loadFromMetachat(s)
+	fmt.Println("Metachat:", metachat)
+
 	return nil
 }
 
@@ -265,10 +269,11 @@ func (metachats *Metachats) MapMetachats(rows *sql.Rows) error {
 			&s.PostchatId, &s.PostchatEnabled, &s.PostchatSendSurvey, &s.PostchatAsk, &s.PostchatShowSolved, &s.PostchatSendEndMsg)
 
 		if err != nil {
-			return nil
+			return err
 		}
 
-		metachat.loadFromMetachow(s)
+		metachat.loadFromMetachat(s)
+		fmt.Println("Metachat:", metachat)
 
 		*metachats = append(*metachats, &metachat)
 	}

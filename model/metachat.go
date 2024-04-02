@@ -37,13 +37,14 @@ type MetachatRow struct {
 	AppearanceLayoutVisitorBubble      string
 	AppearanceLayoutVisitorBubbleText  string
 	AppearanceBtnPosition              int64
-	AppearanceShowAvatar               bool
+	AppearanceShowLogo                 bool
 	AppearanceAvatarId                 string
 	AppearanceIconButton               int64
 	AppearanceShowPositionNum          bool
 	AppearancePlaySoundStart           bool
 	AppearancePlaySoundDecre           bool
 	AppearanceOfferTalkBot             bool
+	AppearanceLogo                     []byte
 	// Deployment fields
 	DeploymentId                      int64
 	DeploymentDeployHtmlCode          string
@@ -116,13 +117,14 @@ type Appearance struct {
 	LayoutVisitorBubble      string `json:"layout_visitor_bubble"`
 	LayoutVisitorBubbleText  string `json:"layout_visitor_bubble_text"`
 	BtnPosition              int64  `json:"btn_position"`
-	ShowAvatar               bool   `json:"show_avatar"`
+	ShowLogo                 bool   `json:"show_logo"`
 	AvatarId                 string `json:"avatar_id"`
 	IconButton               int64  `json:"icon_button"`
 	ShowPositionNum          bool   `json:"show_position_num"`
 	PlaySoundStart           bool   `json:"play_sound_start"`
 	PlaySoundDecre           bool   `json:"play_sound_decre"`
 	OfferTalkBot             bool   `json:"offer_talk_bot"`
+	Logo                     []byte `json:"logo"`
 }
 
 type Deployment struct {
@@ -185,13 +187,14 @@ func (metachat *Metachat) loadFromMetachat(s MetachatRow) {
 	metachat.Appearance.LayoutVisitorBubble = s.AppearanceLayoutVisitorBubble
 	metachat.Appearance.LayoutVisitorBubbleText = s.AppearanceLayoutVisitorBubbleText
 	metachat.Appearance.BtnPosition = s.AppearanceBtnPosition
-	metachat.Appearance.ShowAvatar = s.AppearanceShowAvatar
+	metachat.Appearance.ShowLogo = s.AppearanceShowLogo
 	metachat.Appearance.AvatarId = s.AppearanceAvatarId
 	metachat.Appearance.IconButton = s.AppearanceIconButton
 	metachat.Appearance.ShowPositionNum = s.AppearanceShowPositionNum
 	metachat.Appearance.PlaySoundStart = s.AppearancePlaySoundStart
 	metachat.Appearance.PlaySoundDecre = s.AppearancePlaySoundDecre
 	metachat.Appearance.OfferTalkBot = s.AppearanceOfferTalkBot
+	metachat.Appearance.Logo = s.AppearanceLogo
 
 	metachat.Deployment = &Deployment{}
 	metachat.Deployment.Id = s.DeploymentId
@@ -232,8 +235,8 @@ func (metachat *Metachat) MapMetachat(row *sql.Row) error {
 	var s MetachatRow
 	err := row.Scan(&s.MetachatId, &s.MetachatCustomerId, &s.MetachatSiteId, &s.MetachatThemeId, &s.MetachatCreationDate, &s.MetachatIsEnabled, &s.MetachatIsDeleted,
 		&s.AppearanceId, &s.AppearanceTitle, &s.AppearanceLayout, &s.AppearanceLayoutHeaderColor, &s.AppearanceLayoutHeaderText, &s.AppearanceLayoutBackGround, &s.AppearanceLayoutFooter, &s.AppearanceLayoutOperatorBubble,
-		&s.AppearanceLayoutOperatorBubbleText, &s.AppearanceLayoutVisitorBubble, &s.AppearanceLayoutVisitorBubbleText, &s.AppearanceBtnPosition, &s.AppearanceShowAvatar, &s.AppearanceAvatarId,
-		&s.AppearanceIconButton, &s.AppearanceShowPositionNum, &s.AppearancePlaySoundStart, &s.AppearancePlaySoundDecre, &s.AppearanceOfferTalkBot,
+		&s.AppearanceLayoutOperatorBubbleText, &s.AppearanceLayoutVisitorBubble, &s.AppearanceLayoutVisitorBubbleText, &s.AppearanceBtnPosition, &s.AppearanceShowLogo, &s.AppearanceAvatarId,
+		&s.AppearanceIconButton, &s.AppearanceShowPositionNum, &s.AppearancePlaySoundStart, &s.AppearancePlaySoundDecre, &s.AppearanceOfferTalkBot, &s.AppearanceLogo,
 		&s.DeploymentId, &s.DeploymentDeployHtmlCode, &s.DeploymentMailToSendHtmlCode, &s.DeploymentDomainAllowedDeployment,
 		&s.PrechatId, &s.PrechatEnabled, &s.PrechatName, &s.PrechatNameRequired, &s.PrechatLastname, &s.PrechatLastnameRequired, &s.PrechatEmail,
 		&s.PrechatEmailRequired, &s.PrechatQuestion, &s.PrechatQuestionRequired, &s.PrechatCustom1, &s.PrechatCustom1Required,
@@ -260,8 +263,8 @@ func (metachats *Metachats) MapMetachats(rows *sql.Rows) error {
 
 		err := rows.Scan(&s.MetachatId, &s.MetachatCustomerId, &s.MetachatSiteId, &s.MetachatThemeId, &s.MetachatCreationDate, &s.MetachatIsEnabled, &s.MetachatIsDeleted,
 			&s.AppearanceId, &s.AppearanceTitle, &s.AppearanceLayout, &s.AppearanceLayoutHeaderColor, &s.AppearanceLayoutHeaderText, &s.AppearanceLayoutBackGround, &s.AppearanceLayoutFooter, &s.AppearanceLayoutOperatorBubble,
-			&s.AppearanceLayoutOperatorBubbleText, &s.AppearanceLayoutVisitorBubble, &s.AppearanceLayoutVisitorBubbleText, &s.AppearanceBtnPosition, &s.AppearanceShowAvatar, &s.AppearanceAvatarId,
-			&s.AppearanceIconButton, &s.AppearanceShowPositionNum, &s.AppearancePlaySoundStart, &s.AppearancePlaySoundDecre, &s.AppearanceOfferTalkBot,
+			&s.AppearanceLayoutOperatorBubbleText, &s.AppearanceLayoutVisitorBubble, &s.AppearanceLayoutVisitorBubbleText, &s.AppearanceBtnPosition, &s.AppearanceShowLogo, &s.AppearanceAvatarId,
+			&s.AppearanceIconButton, &s.AppearanceShowPositionNum, &s.AppearancePlaySoundStart, &s.AppearancePlaySoundDecre, &s.AppearanceOfferTalkBot, &s.AppearanceLogo,
 			&s.DeploymentId, &s.DeploymentDeployHtmlCode, &s.DeploymentMailToSendHtmlCode, &s.DeploymentDomainAllowedDeployment,
 			&s.PrechatId, &s.PrechatEnabled, &s.PrechatName, &s.PrechatNameRequired, &s.PrechatLastname, &s.PrechatLastnameRequired, &s.PrechatEmail,
 			&s.PrechatEmailRequired, &s.PrechatQuestion, &s.PrechatQuestionRequired, &s.PrechatCustom1, &s.PrechatCustom1Required,

@@ -20,6 +20,7 @@ type MetachatRow struct {
 	MetachatId           int64
 	MetachatCustomerId   int64
 	MetachatSiteId       int64
+	MetachatWebsiteUuid  string
 	MetachatThemeId      int64
 	MetachatIsEnabled    bool
 	MetachatCreationDate time.Time
@@ -44,7 +45,7 @@ type MetachatRow struct {
 	AppearancePlaySoundStart           bool
 	AppearancePlaySoundDecre           bool
 	AppearanceOfferTalkBot             bool
-	//AppearanceLogo                     []byte
+	AppearanceLogo                     []byte
 	// Deployment fields
 	DeploymentId                      int64
 	DeploymentDeployHtmlCode          string
@@ -124,7 +125,7 @@ type Appearance struct {
 	PlaySoundStart           bool   `json:"play_sound_start"`
 	PlaySoundDecre           bool   `json:"play_sound_decre"`
 	OfferTalkBot             bool   `json:"offer_talk_bot"`
-	//Logo                     []byte `json:"logo"`
+	Logo                     []byte `json:"logo"`
 }
 
 type Deployment struct {
@@ -169,6 +170,7 @@ func (metachat *Metachat) loadFromMetachat(s MetachatRow) {
 	metachat.Id = s.MetachatId
 	metachat.CustomerId = s.MetachatCustomerId
 	metachat.SiteId = s.MetachatSiteId
+	metachat.WebsiteUuid = s.MetachatWebsiteUuid
 	metachat.ThemeId = s.MetachatThemeId
 	metachat.IsEnabled = s.MetachatIsEnabled
 	metachat.CreationDate = s.MetachatCreationDate
@@ -194,7 +196,7 @@ func (metachat *Metachat) loadFromMetachat(s MetachatRow) {
 	metachat.Appearance.PlaySoundStart = s.AppearancePlaySoundStart
 	metachat.Appearance.PlaySoundDecre = s.AppearancePlaySoundDecre
 	metachat.Appearance.OfferTalkBot = s.AppearanceOfferTalkBot
-	//metachat.Appearance.Logo = s.AppearanceLogo
+	metachat.Appearance.Logo = s.AppearanceLogo
 
 	metachat.Deployment = &Deployment{}
 	metachat.Deployment.Id = s.DeploymentId
@@ -233,10 +235,10 @@ func (metachat *Metachat) loadFromMetachat(s MetachatRow) {
 func (metachat *Metachat) MapMetachat(row *sql.Row) error {
 
 	var s MetachatRow
-	err := row.Scan(&s.MetachatId, &s.MetachatCustomerId, &s.MetachatSiteId, &s.MetachatThemeId, &s.MetachatCreationDate, &s.MetachatIsEnabled, &s.MetachatIsDeleted,
+	err := row.Scan(&s.MetachatId, &s.MetachatCustomerId, &s.MetachatSiteId, &s.MetachatWebsiteUuid, &s.MetachatThemeId, &s.MetachatCreationDate, &s.MetachatIsEnabled, &s.MetachatIsDeleted,
 		&s.AppearanceId, &s.AppearanceTitle, &s.AppearanceLayout, &s.AppearanceLayoutHeaderColor, &s.AppearanceLayoutHeaderText, &s.AppearanceLayoutBackGround, &s.AppearanceLayoutFooter, &s.AppearanceLayoutOperatorBubble,
 		&s.AppearanceLayoutOperatorBubbleText, &s.AppearanceLayoutVisitorBubble, &s.AppearanceLayoutVisitorBubbleText, &s.AppearanceBtnPosition, &s.AppearanceShowLogo, &s.AppearanceAvatarId,
-		&s.AppearanceIconButton, &s.AppearanceShowPositionNum, &s.AppearancePlaySoundStart, &s.AppearancePlaySoundDecre, &s.AppearanceOfferTalkBot,
+		&s.AppearanceIconButton, &s.AppearanceShowPositionNum, &s.AppearancePlaySoundStart, &s.AppearancePlaySoundDecre, &s.AppearanceOfferTalkBot, &s.AppearanceLogo,
 		&s.DeploymentId, &s.DeploymentDeployHtmlCode, &s.DeploymentMailToSendHtmlCode, &s.DeploymentDomainAllowedDeployment,
 		&s.PrechatId, &s.PrechatEnabled, &s.PrechatName, &s.PrechatNameRequired, &s.PrechatLastname, &s.PrechatLastnameRequired, &s.PrechatEmail,
 		&s.PrechatEmailRequired, &s.PrechatQuestion, &s.PrechatQuestionRequired, &s.PrechatCustom1, &s.PrechatCustom1Required,
@@ -261,10 +263,10 @@ func (metachats *Metachats) MapMetachats(rows *sql.Rows) error {
 		var metachat Metachat
 		var s MetachatRow
 
-		err := rows.Scan(&s.MetachatId, &s.MetachatCustomerId, &s.MetachatSiteId, &s.MetachatThemeId, &s.MetachatCreationDate, &s.MetachatIsEnabled, &s.MetachatIsDeleted,
+		err := rows.Scan(&s.MetachatId, &s.MetachatCustomerId, &s.MetachatSiteId, &s.MetachatWebsiteUuid, &s.MetachatThemeId, &s.MetachatCreationDate, &s.MetachatIsEnabled, &s.MetachatIsDeleted,
 			&s.AppearanceId, &s.AppearanceTitle, &s.AppearanceLayout, &s.AppearanceLayoutHeaderColor, &s.AppearanceLayoutHeaderText, &s.AppearanceLayoutBackGround, &s.AppearanceLayoutFooter, &s.AppearanceLayoutOperatorBubble,
 			&s.AppearanceLayoutOperatorBubbleText, &s.AppearanceLayoutVisitorBubble, &s.AppearanceLayoutVisitorBubbleText, &s.AppearanceBtnPosition, &s.AppearanceShowLogo, &s.AppearanceAvatarId,
-			&s.AppearanceIconButton, &s.AppearanceShowPositionNum, &s.AppearancePlaySoundStart, &s.AppearancePlaySoundDecre, &s.AppearanceOfferTalkBot,
+			&s.AppearanceIconButton, &s.AppearanceShowPositionNum, &s.AppearancePlaySoundStart, &s.AppearancePlaySoundDecre, &s.AppearanceOfferTalkBot, &s.AppearanceLogo,
 			&s.DeploymentId, &s.DeploymentDeployHtmlCode, &s.DeploymentMailToSendHtmlCode, &s.DeploymentDomainAllowedDeployment,
 			&s.PrechatId, &s.PrechatEnabled, &s.PrechatName, &s.PrechatNameRequired, &s.PrechatLastname, &s.PrechatLastnameRequired, &s.PrechatEmail,
 			&s.PrechatEmailRequired, &s.PrechatQuestion, &s.PrechatQuestionRequired, &s.PrechatCustom1, &s.PrechatCustom1Required,

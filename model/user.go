@@ -17,21 +17,22 @@ type User struct {
 	//
 	// required: false
 	// min: 1
-	Id            int64     `json:"id"`
-	Email         string    `json:"email" validate:"required,email"`
-	Firstname     string    `json:"firstName" validate:"required"`
-	Lastname      string    `json:"lastName" validate:"required"`
-	Phone         int64     `json:"phone"`
-	Country       int64     `json:"country"`
-	Language      int64     `json:"language"`
-	Alias         string    `json:"alias" validate:"required"`
-	Avatar        string    `json:"avatar" validate:"required"`
-	Status        string    `json:"status" validate:"required"`
-	ResetPassword bool      `json:"resetPassword"`
-	Password      string    `json:"password" validate:"required"`
-	CreationDate  time.Time `json:"creationDate"`
-	Isactive      bool      `json:"isactive"`
-	Isdeleted     bool      `json:"isdeleted"`
+	Id               int64     `json:"id"`
+	Email            string    `json:"email" validate:"required,email"`
+	Firstname        string    `json:"firstName" validate:"required"`
+	Lastname         string    `json:"lastName" validate:"required"`
+	Phone            int64     `json:"phone"`
+	Country          int64     `json:"country"`
+	Language         int64     `json:"language"`
+	EmailConfirmated int64     `json:"emailConfirmated"`
+	Alias            string    `json:"alias" validate:"required"`
+	Avatar           string    `json:"avatar" validate:"required"`
+	Status           string    `json:"status" validate:"required"`
+	ResetPassword    bool      `json:"resetPassword"`
+	Password         string    `json:"password" validate:"required"`
+	CreationDate     time.Time `json:"creationDate"`
+	Isactive         bool      `json:"isactive"`
+	Isdeleted        bool      `json:"isdeleted"`
 }
 
 // swagger:model

@@ -21,9 +21,9 @@ type User struct {
 	Email            string    `json:"email" validate:"required,email"`
 	Firstname        string    `json:"firstName" validate:"required"`
 	Lastname         string    `json:"lastName" validate:"required"`
-	Phone            int64     `json:"phone"`
-	Country          int64     `json:"country"`
-	Language         int64     `json:"language"`
+	Phone            string    `json:"phone"`
+	Country          string    `json:"country"`
+	Language         string    `json:"language"`
 	EmailConfirmated int64     `json:"emailConfirmated"`
 	Alias            string    `json:"alias" validate:"required"`
 	Avatar           string    `json:"avatar" validate:"required"`

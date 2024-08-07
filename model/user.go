@@ -30,6 +30,7 @@ type User struct {
 	Status           string    `json:"status" validate:"required"`
 	ResetPassword    bool      `json:"resetPassword"`
 	Password         string    `json:"password" validate:"required"`
+	PasswordOld      string    `json:"passwordOld"`
 	CreationDate     time.Time `json:"creationDate"`
 	Isactive         bool      `json:"isactive"`
 	Isdeleted        bool      `json:"isdeleted"`

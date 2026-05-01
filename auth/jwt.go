@@ -11,7 +11,7 @@ import (
 
 var secretString = os.Getenv("JWT_SECRET")
 var jwtKey = []byte(secretString)
-var defaultExpirationTime = 1 // TODO GET FROM ENV
+var defaultExpirationTime = 6 // TODO GET FROM ENV
 
 type JWTClaim struct {
 	UserId     int64       `json:"user_id"`

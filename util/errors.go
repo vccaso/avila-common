@@ -60,39 +60,35 @@ func CheckDebug(m string) {
 }
 
 func SendToLog(app string, level string, m string) {
-	error := model.Error{}
-	error.App = app
-	error.Error_time = time.Now()
-	error.Message = m
-	error.Gateway_session = "TODO"
-	error.Level = level
+	go func() {
+		errorModel := model.Error{}
+		errorModel.App = app
+		errorModel.Error_time = time.Now()
+		errorModel.Message = m
+		errorModel.Gateway_session = "TODO"
+		errorModel.Level = level
 
-	reqBodyBytes := new(bytes.Buffer)
-	json.NewEncoder(reqBodyBytes).Encode(error)
+		reqBodyBytes := new(bytes.Buffer)
+		if err := json.NewEncoder(reqBodyBytes).Encode(errorModel); err != nil {
+			Error.Println("Error encoding log:", err)
+			return
+		}
 
-	// Prepare a path http request
-	client := &http.Client{}
-	req, nil := http.NewRequest(http.MethodPost, logs_host+"/error", bytes.NewBuffer(reqBodyBytes.Bytes()))
-	req.Header.Set("Content-Type", "application/json")
-	resp, err := client.Do(req)
+		client := &http.Client{
+			Timeout: 5 * time.Second,
+		}
+		req, err := http.NewRequest(http.MethodPost, logs_host+"/error", reqBodyBytes)
+		if err != nil {
+			Error.Println("Error creating log request:", err)
+			return
+		}
+		req.Header.Set("Content-Type", "application/json")
 
-	if err != nil {
-		Error.Println(err.Error())
-	}
-
-	defer resp.Body.Close()
-	// if handleResponse {
-	// 	res.WriteHeader(resp.StatusCode)
-	// 	io.Copy(res, resp.Body)
-	// }
-
-	// resp, err := http.Post(logs_host+"/error", "application/json", bytes.NewBuffer(reqBodyBytes.Bytes()))
-	// if resp != nil {
-	// 	defer resp.Body.Close()
-	// }
-	// if err != nil {
-	// 	Error.Println(err.Error())
-	// }
-	// defer resp.Body.Close()
-
+		resp, err := client.Do(req)
+		if err != nil {
+			Error.Println("Error sending log to avila-logs:", err)
+			return
+		}
+		defer resp.Body.Close()
+	}()
 }

@@ -25,6 +25,6 @@ func JsonResponseWithCode(response http.ResponseWriter, data interface{}, httpCo
 func ObjectFromBody(request *http.Request, data interface{}) error {
 
 	decoder := json.NewDecoder(request.Body)
-	err := decoder.Decode(&data)
+	err := decoder.Decode(data)
 	return err
 }

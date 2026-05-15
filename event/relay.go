@@ -137,6 +137,7 @@ func processOutbox(ctx context.Context, cfg EventConfig, workerID string) {
 			log.Printf("[%s] Failed to publish event %s: %v", cfg.ServiceName, e.EventID, err)
 			markFailed(ctx, cfg.DB, e.ID, e.RetryCount, cfg.MaxRetries, err.Error())
 		} else {
+			log.Printf("[%s] Successfully published event %s to subject %s", cfg.ServiceName, e.EventID, subject)
 			markPublished(ctx, cfg.DB, e.ID)
 		}
 	}

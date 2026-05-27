@@ -3,9 +3,13 @@ package event
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"log"
+	"net/http"
 	"os"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -159,4 +163,382 @@ func markFailed(ctx context.Context, db *sql.DB, id int64, currentRetry, maxRetr
 
 	_, _ = db.ExecContext(ctx, "UPDATE outbox_events SET status = ?, retry_count = ?, last_error = ?, locked_by = NULL, locked_at = NULL WHERE id = ?", 
 		status, newRetry, errMsg, id)
+}
+
+// OutboxEvent represents an event in the outbox_events table.
+type OutboxEvent struct {
+	ID            int64      `json:"id"`
+	EventID       string     `json:"event_id"`
+	CorrelationID *string    `json:"correlation_id"`
+	EventType     string     `json:"event_type"`
+	AggregateType string     `json:"aggregate_type"`
+	AggregateID   string     `json:"aggregate_id"`
+	Payload       string     `json:"payload"` // JSON string
+	CustomerID    string     `json:"customer_id"`
+	Status        string     `json:"status"`
+	RetryCount    int        `json:"retry_count"`
+	LockedAt      *time.Time `json:"locked_at"`
+	LockedBy      *string    `json:"locked_by"`
+	LastError     *string    `json:"last_error"`
+	OccurredAt    time.Time  `json:"occurred_at"`
+	PublishedAt   *time.Time `json:"published_at"`
+}
+
+// ProcessedEvent represents a row in processed_events.
+type ProcessedEvent struct {
+	EventID     string    `json:"event_id"`
+	ProcessedAt time.Time `json:"processed_at"`
+}
+
+// PaginationMetadata represents pagination information.
+type PaginationMetadata struct {
+	Total int `json:"total"`
+	Page  int `json:"page"`
+	Limit int `json:"limit"`
+	Pages int `json:"pages"`
+}
+
+// PaginatedResponse wraps items with pagination metadata.
+type PaginatedResponse[T any] struct {
+	Data       []T                `json:"data"`
+	Pagination PaginationMetadata `json:"pagination"`
+}
+
+// QueryOutboxEvents queries the outbox_events table with filtering and pagination.
+func QueryOutboxEvents(ctx context.Context, db *sql.DB, customerID, status, eventType, eventID, correlationID string, page, limit int) ([]OutboxEvent, int, error) {
+	if limit <= 0 {
+		limit = 20
+	}
+	if page <= 0 {
+		page = 1
+	}
+	offset := (page - 1) * limit
+
+	query := "SELECT id, event_id, correlation_id, event_type, aggregate_type, aggregate_id, payload, customer_id, status, retry_count, locked_at, locked_by, last_error, occurred_at, published_at FROM outbox_events WHERE 1=1"
+	countQuery := "SELECT COUNT(*) FROM outbox_events WHERE 1=1"
+	var args []any
+	var countArgs []any
+
+	if customerID != "" {
+		query += " AND customer_id = ?"
+		countQuery += " AND customer_id = ?"
+		args = append(args, customerID)
+		countArgs = append(countArgs, customerID)
+	}
+	if status != "" {
+		query += " AND status = ?"
+		countQuery += " AND status = ?"
+		args = append(args, status)
+		countArgs = append(countArgs, status)
+	}
+	if eventType != "" {
+		query += " AND event_type LIKE ?"
+		countQuery += " AND event_type LIKE ?"
+		args = append(args, "%"+eventType+"%")
+		countArgs = append(countArgs, "%"+eventType+"%")
+	}
+	if eventID != "" {
+		query += " AND event_id = ?"
+		countQuery += " AND event_id = ?"
+		args = append(args, eventID)
+		countArgs = append(countArgs, eventID)
+	}
+	if correlationID != "" {
+		query += " AND correlation_id = ?"
+		countQuery += " AND correlation_id = ?"
+		args = append(args, correlationID)
+		countArgs = append(countArgs, correlationID)
+	}
+
+	var total int
+	err := db.QueryRowContext(ctx, countQuery, countArgs...).Scan(&total)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	query += " ORDER BY occurred_at DESC LIMIT ? OFFSET ?"
+	args = append(args, limit, offset)
+
+	rows, err := db.QueryContext(ctx, query, args...)
+	if err != nil {
+		return nil, 0, err
+	}
+	defer rows.Close()
+
+	var events []OutboxEvent
+	for rows.Next() {
+		var e OutboxEvent
+		var corr sql.NullString
+		var lockedAt sql.NullTime
+		var lockedBy sql.NullString
+		var lastErr sql.NullString
+		var pubAt sql.NullTime
+		var payloadBytes []byte
+
+		err := rows.Scan(
+			&e.ID, &e.EventID, &corr, &e.EventType, &e.AggregateType,
+			&e.AggregateID, &payloadBytes, &e.CustomerID, &e.Status,
+			&e.RetryCount, &lockedAt, &lockedBy, &lastErr, &e.OccurredAt, &pubAt,
+		)
+		if err != nil {
+			return nil, 0, err
+		}
+
+		e.Payload = string(payloadBytes)
+
+		if corr.Valid {
+			e.CorrelationID = &corr.String
+		}
+		if lockedAt.Valid {
+			e.LockedAt = &lockedAt.Time
+		}
+		if lockedBy.Valid {
+			e.LockedBy = &lockedBy.String
+		}
+		if lastErr.Valid {
+			e.LastError = &lastErr.String
+		}
+		if pubAt.Valid {
+			e.PublishedAt = &pubAt.Time
+		}
+
+		events = append(events, e)
+	}
+
+	return events, total, nil
+}
+
+// QueryProcessedEvents queries the processed_events table with filtering and pagination.
+func QueryProcessedEvents(ctx context.Context, db *sql.DB, eventID string, page, limit int) ([]ProcessedEvent, int, error) {
+	if limit <= 0 {
+		limit = 20
+	}
+	if page <= 0 {
+		page = 1
+	}
+	offset := (page - 1) * limit
+
+	query := "SELECT event_id, processed_at FROM processed_events WHERE 1=1"
+	countQuery := "SELECT COUNT(*) FROM processed_events WHERE 1=1"
+	var args []any
+	var countArgs []any
+
+	if eventID != "" {
+		query += " AND event_id = ?"
+		countQuery += " AND event_id = ?"
+		args = append(args, eventID)
+		countArgs = append(countArgs, eventID)
+	}
+
+	var total int
+	err := db.QueryRowContext(ctx, countQuery, countArgs...).Scan(&total)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	query += " ORDER BY processed_at DESC LIMIT ? OFFSET ?"
+	args = append(args, limit, offset)
+
+	rows, err := db.QueryContext(ctx, query, args...)
+	if err != nil {
+		return nil, 0, err
+	}
+	defer rows.Close()
+
+	var events []ProcessedEvent
+	for rows.Next() {
+		var e ProcessedEvent
+		err := rows.Scan(&e.EventID, &e.ProcessedAt)
+		if err != nil {
+			return nil, 0, err
+		}
+		events = append(events, e)
+	}
+
+	return events, total, nil
+}
+
+// RetryEvent resets status of a specific outbox event to 'pending'.
+func RetryEvent(ctx context.Context, db *sql.DB, id int64) (*OutboxEvent, error) {
+	updateQuery := `
+		UPDATE outbox_events
+		SET status = 'pending', retry_count = 0, last_error = NULL, locked_by = NULL, locked_at = NULL
+		WHERE id = ?
+	`
+	_, err := db.ExecContext(ctx, updateQuery, id)
+	if err != nil {
+		return nil, err
+	}
+
+	query := "SELECT id, event_id, correlation_id, event_type, aggregate_type, aggregate_id, payload, customer_id, status, retry_count, locked_at, locked_by, last_error, occurred_at, published_at FROM outbox_events WHERE id = ?"
+	var e OutboxEvent
+	var corr sql.NullString
+	var lockedAt sql.NullTime
+	var lockedBy sql.NullString
+	var lastErr sql.NullString
+	var pubAt sql.NullTime
+	var payloadBytes []byte
+
+	err = db.QueryRowContext(ctx, query, id).Scan(
+		&e.ID, &e.EventID, &corr, &e.EventType, &e.AggregateType,
+		&e.AggregateID, &payloadBytes, &e.CustomerID, &e.Status,
+		&e.RetryCount, &lockedAt, &lockedBy, &lastErr, &e.OccurredAt, &pubAt,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	e.Payload = string(payloadBytes)
+	if corr.Valid {
+		e.CorrelationID = &corr.String
+	}
+	if lockedAt.Valid {
+		e.LockedAt = &lockedAt.Time
+	}
+	if lockedBy.Valid {
+		e.LockedBy = &lockedBy.String
+	}
+	if lastErr.Valid {
+		e.LastError = &lastErr.String
+	}
+	if pubAt.Valid {
+		e.PublishedAt = &pubAt.Time
+	}
+
+	return &e, nil
+}
+
+// extractIDFromPath parses the ID from path e.g. /api/admin/outbox-events/{id}/retry
+func extractIDFromPath(path string) (int64, error) {
+	parts := strings.Split(path, "/")
+	for i, part := range parts {
+		if part == "outbox-events" && i+1 < len(parts) {
+			idStr := parts[i+1]
+			if idx := strings.Index(idStr, "?"); idx != -1 {
+				idStr = idStr[:idx]
+			}
+			id, err := strconv.ParseInt(idStr, 10, 64)
+			if err == nil {
+				return id, nil
+			}
+		}
+	}
+	return 0, fmt.Errorf("id not found in path")
+}
+
+// HandleGetOutboxEvents is a reusable Gorilla Mux HTTP handler for querying outbox events.
+func HandleGetOutboxEvents(db *sql.DB, w http.ResponseWriter, req *http.Request) {
+	ctx := req.Context()
+	customerID := req.Header.Get("X-Customer-Id")
+	if customerID == "" {
+		customerID = req.URL.Query().Get("customer_id")
+	}
+	status := req.URL.Query().Get("status")
+	eventType := req.URL.Query().Get("event_type")
+	eventID := req.URL.Query().Get("event_id")
+	correlationID := req.URL.Query().Get("correlation_id")
+
+	limitStr := req.URL.Query().Get("limit")
+	limit, _ := strconv.Atoi(limitStr)
+	if limit <= 0 {
+		limit = 20
+	}
+
+	pageStr := req.URL.Query().Get("page")
+	page, _ := strconv.Atoi(pageStr)
+	if page <= 0 {
+		page = 1
+	}
+
+	events, total, err := QueryOutboxEvents(ctx, db, customerID, status, eventType, eventID, correlationID, page, limit)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("database error: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	pages := total / limit
+	if total%limit > 0 {
+		pages++
+	}
+
+	resp := PaginatedResponse[OutboxEvent]{
+		Data: events,
+		Pagination: PaginationMetadata{
+			Total: total,
+			Page:  page,
+			Limit: limit,
+			Pages: pages,
+		},
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	_ = json.NewEncoder(w).Encode(resp)
+}
+
+// HandleGetProcessedEvents is a reusable Gorilla Mux HTTP handler for querying processed events.
+func HandleGetProcessedEvents(db *sql.DB, w http.ResponseWriter, req *http.Request) {
+	ctx := req.Context()
+	eventID := req.URL.Query().Get("event_id")
+
+	limitStr := req.URL.Query().Get("limit")
+	limit, _ := strconv.Atoi(limitStr)
+	if limit <= 0 {
+		limit = 20
+	}
+
+	pageStr := req.URL.Query().Get("page")
+	page, _ := strconv.Atoi(pageStr)
+	if page <= 0 {
+		page = 1
+	}
+
+	events, total, err := QueryProcessedEvents(ctx, db, eventID, page, limit)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("database error: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	pages := total / limit
+	if total%limit > 0 {
+		pages++
+	}
+
+	resp := PaginatedResponse[ProcessedEvent]{
+		Data: events,
+		Pagination: PaginationMetadata{
+			Total: total,
+			Page:  page,
+			Limit: limit,
+			Pages: pages,
+		},
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	_ = json.NewEncoder(w).Encode(resp)
+}
+
+// HandleRetryOutboxEvent is a reusable Gorilla Mux HTTP handler for retrying an outbox event.
+func HandleRetryOutboxEvent(db *sql.DB, w http.ResponseWriter, req *http.Request) {
+	ctx := req.Context()
+	id, err := extractIDFromPath(req.URL.Path)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	e, err := RetryEvent(ctx, db, id)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			http.Error(w, "event not found", http.StatusNotFound)
+			return
+		}
+		http.Error(w, fmt.Sprintf("database error: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	_ = json.NewEncoder(w).Encode(e)
 }

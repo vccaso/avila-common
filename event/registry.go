@@ -74,4 +74,18 @@ var SystemEventsRegistry = []EventMetadata{
 		Description: "Triggered when any system notification or automated email response is sent.",
 		Icon:        "paper-airplane",
 	},
+	{
+		Type:        "user.affiliate_admin.created",
+		Label:       "Affiliate Admin Created",
+		Service:     "user",
+		Description: "Triggered when a user is registered with the Affiliate Admin role (ID: 13)",
+		Icon:        "user-plus",
+	},
+	{
+		Type:        "customer.created",
+		Label:       "Customer Created",
+		Service:     "user",
+		Description: "Triggered when a new Customer/Tenant organization is successfully created",
+		Icon:        "building",
+	},
 }

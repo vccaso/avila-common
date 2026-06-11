@@ -40,6 +40,27 @@ var SystemEventsRegistry = []EventMetadata{
 		Icon:        "building-office-2",
 	},
 	{
+		Type:        "campaign.launched",
+		Label:       "Campaign Launched",
+		Service:     "contact",
+		Description: "Triggered when a campaign run is created and recipients are enrolled.",
+		Icon:        "megaphone",
+	},
+	{
+		Type:        "campaign.recipient.queued",
+		Label:       "Campaign Recipient Queued",
+		Service:     "contact",
+		Description: "Triggered when a campaign recipient is ready to be dispatched to an AI Agent execution.",
+		Icon:        "send",
+	},
+	{
+		Type:        "campaign.recipient.reply_received",
+		Label:       "Campaign Recipient Reply Received",
+		Service:     "contact",
+		Description: "Triggered when an inbound email reply maps back to a campaign recipient.",
+		Icon:        "reply",
+	},
+	{
 		Type:        "agent.execution.completed",
 		Label:       "Agent Execution Completed",
 		Service:     "agent",

@@ -109,4 +109,11 @@ var SystemEventsRegistry = []EventMetadata{
 		Description: "Triggered when a new Customer/Tenant organization is successfully created",
 		Icon:        "building",
 	},
+	{
+		Type:        "chat.lead_tagged",
+		Label:       "Chat Lead Tagged",
+		Service:     "contact",
+		Description: "Triggered when an EazyChat operator flags a chat visitor as a lead.",
+		Icon:        "user-circle",
+	},
 }

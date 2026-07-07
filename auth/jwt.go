@@ -18,10 +18,11 @@ type JWTClaim struct {
 	Email      string      `json:"email"`
 	CustomerId int64       `json:"customer_id"`
 	Roles      model.Roles `json:"roles"`
+	Features   []string    `json:"features,omitempty"`
 	jwt.StandardClaims
 }
 
-func GenerateJwt(userId int64, email string, customerId int64, roles model.Roles) (tokenString string, err error) {
+func GenerateJwt(userId int64, email string, customerId int64, roles model.Roles, features []string) (tokenString string, err error) {
 
 	expirationTime := time.Now().Add(time.Duration(defaultExpirationTime) * time.Hour)
 	claims := &JWTClaim{
@@ -29,6 +30,7 @@ func GenerateJwt(userId int64, email string, customerId int64, roles model.Roles
 		Email:      email,
 		CustomerId: customerId,
 		Roles:      roles,
+		Features:   features,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: expirationTime.Unix(),
 		},
@@ -38,7 +40,7 @@ func GenerateJwt(userId int64, email string, customerId int64, roles model.Roles
 	return
 }
 
-func GenerateJwtAndRefresh(userId int64, email string, customerId int64, roles model.Roles) (tokenString string, tokenRefresh string, err error) {
+func GenerateJwtAndRefresh(userId int64, email string, customerId int64, roles model.Roles, features []string) (tokenString string, tokenRefresh string, err error) {
 
 	expirationTime := time.Now().Add(time.Duration(defaultExpirationTime) * time.Hour)
 	claims := &JWTClaim{
@@ -46,6 +48,7 @@ func GenerateJwtAndRefresh(userId int64, email string, customerId int64, roles m
 		Email:      email,
 		CustomerId: customerId,
 		Roles:      roles,
+		Features:   features,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: expirationTime.Unix(),
 		},

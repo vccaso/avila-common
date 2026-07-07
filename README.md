@@ -1,11 +1,38 @@
-# module avila-common
-avila-common
+# Avila Common Library
 
-# lint
+Shared utilities, models, and architecture patterns for the Avila microservices ecosystem.
 
-## To install golangci-lint Locally:
+## 📦 Core Packages
 
-``` go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest```
+### 1. `event`
+Implements the core logic for the **Hybrid Event Architecture**:
+- **`relay.go`**: Reusable `OutboxRelay` worker that handles concurrency-safe polling, locking, and publishing to NATS JetStream.
+- **`consumer.go`**: Reusable `ProcessIdempotentEvent` wrapper that handles duplicate checks and transaction management for reliable consumption.
 
-## To call golangci-lint Locally:
-``` golangci-lint run ./...```
+### 2. `util`
+- **Logging**: Structured logging (Info, Warning, Error).
+- **Environment**: Helpers for parsing environment variables.
+
+### 3. `auth`
+- Shared authentication and JWT verification middleware.
+
+### 4. `model`
+- Shared domain models used across multiple services.
+
+## ⚙️ Dependencies
+- `github.com/nats-io/nats.go`: Message Bus connectivity.
+- `github.com/google/uuid`: Unique identification for events and workers.
+
+## Lint
+
+### To install golangci-lint locally:
+
+```bash
+go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+```
+
+### To run golangci-lint locally:
+
+```bash
+golangci-lint run ./...
+```
